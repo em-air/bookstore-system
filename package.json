@@ -4,11 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
-    "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build",
-    "build:server": "esbuild server/index.ts --bundle --platform=node --packages=external --outfile=api/index.js --format=esm --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
-    "start": "cross-env NODE_ENV=production node api/index.js",
-    "vercel-build": "npm run build",
+    "build": "vite build",
+    "start": "cross-env NODE_ENV=production node server/index.ts",
+    "vercel-build": "vite build",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx server/seed.ts"
