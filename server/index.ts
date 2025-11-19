@@ -58,17 +58,21 @@ app.use((req, res, next) => {
     throw err;
   });
 
+  // Only setup Vite in development
+  if (process.env.NODE_ENV !== "production") {
+    if (app.get("env") === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
 
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    const port = parseInt(process.env.PORT || '5000', 10);
+    server.listen(port, "127.0.0.1", () => {
+      log(`serving on port ${port}`);
+      console.log(`🚀 Server running at http://localhost:${port}`);
+    });
   }
-
-  
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen(port, "127.0.0.1", () => {
-    log(`serving on port ${port}`);
-    console.log(`🚀 Server running at http://localhost:${port}`);
-  });
 })();
+
+// Export for Vercel serverless
+export default app;
