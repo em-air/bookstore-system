@@ -15,6 +15,5 @@
     }
   ],
   "env": {
-    "SESSION_SECRET": "@session_secret"
   }
 }
