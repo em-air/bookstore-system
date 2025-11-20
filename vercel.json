@@ -1,4 +1,9 @@
 {
+  "installCommand": "npm install",
+  "buildCommand": "npm run vercel-build",
+  "devCommand": "npm run dev",
+  "outputDirectory": "dist/public",
+  "framework": null,
   "rewrites": [
     {
       "source": "/api/(.*)",
