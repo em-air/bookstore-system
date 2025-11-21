@@ -1,12 +1,6 @@
 {
   "buildCommand": "vite build",
   "outputDirectory": "dist/public",
-  "framework": null,
-  "includeFiles": [
-    "server/**",
-    "shared/**",
-    "node_modules/**"
-  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
