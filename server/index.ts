@@ -48,7 +48,7 @@ app.use((req, res, next) => {
 });
 
 // Initialize routes
-const server = await registerRoutes(app);
+registerRoutes(app);
 
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   const status = err.status || err.statusCode || 500;
@@ -62,6 +62,8 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 // Only run server in development
 if (process.env.NODE_ENV !== "production") {
+  const { createServer } = await import("http");
+  const server = createServer(app);
   
   if (app.get("env") === "development") {
     await setupVite(app, server);
