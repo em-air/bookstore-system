@@ -94,8 +94,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const books = await storage.getAllBooks();
       res.json(books);
-    } catch {
-      res.status(500).json({ message: "Failed to fetch books" });
+    } catch (error: any) {
+      console.error('Failed to fetch books:', error.message);
+      res.status(500).json({ message: "Failed to fetch books", error: error.message });
     }
   });
 
