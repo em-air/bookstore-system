@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const mod = await import('../../server/index.ts');
+    const mod = await import('../../server/index.js');
     const app = mod.default;
     return (app as any)(req, res);
   } catch (e: any) {
