@@ -237,25 +237,24 @@ export const refundsRelations = relations(refunds, ({ one }) => ({
 }));
 
 export const insertUserSchema = createInsertSchema(users, {
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  firstname: z.string().optional(),
-  lastname: z.string().optional(),
+  email: (schema) => schema.email.email("Invalid email address"),
+  password: (schema) => schema.password.min(6, "Password must be at least 6 characters"),
+  username: (schema) => schema.username.min(3, "Username must be at least 3 characters"),
 }).omit({
   id: true,
   createdAt: true,
 });
 
 export const insertCardSchema = createInsertSchema(cards, {
-  cardNum: z.string().length(16, "Card number must be 16 digits"),
-  expireDate: z.string().regex(/^\d{2}\/\d{4}$/, "Expire date must be MM/YYYY format"),
-  cvc: z.string().min(3).max(4, "CVC must be 3-4 digits"),
-  firstname: z.string().min(1, "First name is required"),
-  lastname: z.string().min(1, "Last name is required"),
+  cardNum: (schema) => schema.cardNum.length(16, "Card number must be 16 digits"),
+  expireDate: (schema) => schema.expireDate.regex(/^\d{2}\/\d{4}$/, "Expire date must be in MM/YYYY format"),
+  cvc: (schema) => schema.cvc.min(3).max(4, "CVC must be 3-4 digits"),
+  firstname: (schema) => schema.firstname.min(1, "First name is required"),
+  lastname: (schema) => schema.lastname.min(1, "Last name is required"),
 }).omit({
   id: true,
   createdAt: true,
+  userId: true,
 });
 
 export const insertBookSchema = createInsertSchema(books).omit({
@@ -269,14 +268,14 @@ export const insertShoppingCartSchema = createInsertSchema(shoppingCarts).omit({
 });
 
 export const insertShoppingCartItemSchema = createInsertSchema(shoppingCartItems, {
-  quantity: z.number().int().positive(),
+  quantity: (schema) => schema.quantity.int().positive(),
 }).omit({
   id: true,
   createdAt: true,
 });
 
 export const insertStoreInventorySchema = createInsertSchema(storeInventory, {
-  quantity: z.number().int().min(0, "Quantity cannot be negative"),
+  quantity: (schema) => schema.quantity.int().min(0, "Quantity cannot be negative"),
 }).omit({
   id: true,
   createdAt: true,
@@ -284,7 +283,7 @@ export const insertStoreInventorySchema = createInsertSchema(storeInventory, {
 });
 
 export const insertCartItemSchema = createInsertSchema(cartItems, {
-  quantity: z.number().int().positive(),
+  quantity: (schema) => schema.quantity.int().positive(),
 }).omit({
   id: true,
   createdAt: true,
@@ -302,14 +301,14 @@ export const insertOrderItemSchema = createInsertSchema(orderItems).omit({
 });
 
 export const insertReviewSchema = createInsertSchema(reviews, {
-  rating: z.number().int().min(1).max(5),
+  rating: (schema) => schema.rating.int().min(1).max(5),
 }).omit({
   id: true,
   createdAt: true,
 });
 
 export const insertRefundSchema = createInsertSchema(refunds, {
-  reason: z.string().min(10, "Reason must be at least 10 characters"),
+  reason: (schema) => schema.reason.min(10, "Reason must be at least 10 characters"),
 }).omit({
   id: true,
   createdAt: true,
