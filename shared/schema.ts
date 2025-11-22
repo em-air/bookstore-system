@@ -236,83 +236,97 @@ export const refundsRelations = relations(refunds, ({ one }) => ({
   }),
 }));
 
-export const insertUserSchema = createInsertSchema(users, {
+// Base insert schemas (no overrides to avoid version signature issues); separate validation schemas extend these.
+// Manual insert validation schemas (avoid drizzle-zod override issues)
+export const insertUserSchema = z.object({
+  username: z.string().min(3),
+  email: z.string().email(),
+  password: z.string().min(6),
+  firstname: z.string().optional(),
+  lastname: z.string().optional(),
+  role: z.enum(["customer", "staff", "admin"]).optional(),
+});
+
+export const validateUserRegistrationSchema = insertUserSchema.extend({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   username: z.string().min(3, "Username must be at least 3 characters"),
-}).omit({
-  id: true,
-  createdAt: true,
 });
 
-export const insertCardSchema = createInsertSchema(cards, {
+export const insertCardSchema = z.object({
+  userId: z.number().int(),
+  cardNum: z.string().length(16),
+  expireDate: z.string().regex(/^\d{2}\/\d{4}$/),
+  cvc: z.string().min(3).max(4),
+  firstname: z.string().min(1),
+  lastname: z.string().min(1),
+});
+
+export const validateCardSchema = insertCardSchema.extend({
   cardNum: z.string().length(16, "Card number must be 16 digits"),
   expireDate: z.string().regex(/^\d{2}\/\d{4}$/, "Expire date must be in MM/YYYY format"),
   cvc: z.string().min(3).max(4, "CVC must be 3-4 digits"),
   firstname: z.string().min(1, "First name is required"),
   lastname: z.string().min(1, "Last name is required"),
-}).omit({
-  id: true,
-  createdAt: true,
-  userId: true,
 });
 
-export const insertBookSchema = createInsertSchema(books).omit({
-  id: true,
-  createdAt: true,
+export const insertBookSchema = createInsertSchema(books);
+
+export const insertShoppingCartSchema = createInsertSchema(shoppingCarts);
+
+export const insertShoppingCartItemSchema = z.object({
+  cartId: z.number().int(),
+  bookId: z.number().int(),
+  quantity: z.number().int().positive().default(1),
 });
 
-export const insertShoppingCartSchema = createInsertSchema(shoppingCarts).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertShoppingCartItemSchema = createInsertSchema(shoppingCartItems, {
+export const validateShoppingCartItemSchema = insertShoppingCartItemSchema.extend({
   quantity: z.number().int().positive(),
-}).omit({
-  id: true,
-  createdAt: true,
 });
 
-export const insertStoreInventorySchema = createInsertSchema(storeInventory, {
+export const insertStoreInventorySchema = z.object({
+  bookId: z.number().int(),
+  quantity: z.number().int().nonnegative().default(0),
+});
+
+export const validateStoreInventorySchema = insertStoreInventorySchema.extend({
   quantity: z.number().int().min(0, "Quantity cannot be negative"),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
 });
 
-export const insertCartItemSchema = createInsertSchema(cartItems, {
+export const insertCartItemSchema = z.object({
+  userId: z.number().int(),
+  bookId: z.number().int(),
+  quantity: z.number().int().positive().default(1),
+});
+
+export const validateCartItemSchema = insertCartItemSchema.extend({
   quantity: z.number().int().positive(),
-}).omit({
-  id: true,
-  createdAt: true,
 });
 
-export const insertOrderSchema = createInsertSchema(orders).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+export const insertOrderSchema = createInsertSchema(orders);
 
-export const insertOrderItemSchema = createInsertSchema(orderItems).omit({
-  id: true,
-  createdAt: true,
-});
+export const insertOrderItemSchema = createInsertSchema(orderItems);
 
-export const insertReviewSchema = createInsertSchema(reviews, {
+export const insertReviewSchema = z.object({
+  userId: z.number().int(),
+  bookId: z.number().int(),
   rating: z.number().int().min(1).max(5),
-}).omit({
-  id: true,
-  createdAt: true,
+  comment: z.string().optional(),
 });
 
-export const insertRefundSchema = createInsertSchema(refunds, {
+export const validateReviewSchema = insertReviewSchema.extend({
+  rating: z.number().int().min(1).max(5),
+});
+
+export const insertRefundSchema = z.object({
+  userId: z.number().int(),
+  orderId: z.number().int(),
+  reason: z.string().min(10),
+  status: z.enum(["pending", "approved", "denied"]).optional(),
+});
+
+export const validateRefundSchema = insertRefundSchema.extend({
   reason: z.string().min(10, "Reason must be at least 10 characters"),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
 });
 
 export type User = typeof users.$inferSelect;
