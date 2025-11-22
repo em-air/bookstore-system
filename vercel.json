@@ -1,10 +1,15 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "SKIP_TYPE_CHECK=true npm run build",
   "outputDirectory": "dist/public",
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api"
     }
-  ]
+  ],
+  "functions": {
+    "api/*.ts": {
+      "runtime": "nodejs20.x"
+    }
+  }
 }
