@@ -9,7 +9,7 @@
   ],
   "functions": {
     "api/**/*.ts": {
-      "includeFiles": ["shared/**", "server/**"]
+      "includeFiles": "{shared,server}/**"
     }
   }
 }
