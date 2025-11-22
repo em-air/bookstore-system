@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Lazy load the app
     if (!app) {
       console.log('Loading app from server/index...');
-      app = (await import('../server/index')).default;
+      app = (await import('../server/index.js')).default;
       console.log('App loaded successfully');
     }
     
