@@ -13,8 +13,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		return res.status(405).json({ message: 'Method Not Allowed' });
 	}
 
-	let body: any = req.body;
-	if (typeof body === 'string') {
+	let body: any = (req as any).body;
+	if (!body) {
+		let raw = '';
+		await new Promise<void>(resolve => {
+			req.on('data', chunk => { raw += chunk; });
+			req.on('end', () => resolve());
+		});
+		if (raw) {
+			try { body = JSON.parse(raw); } catch {
+				// Fallback to urlencoded parsing
+				body = Object.fromEntries(new URLSearchParams(raw));
+			}
+		}
+	} else if (typeof body === 'string') {
 		try { body = JSON.parse(body); } catch { return res.status(400).json({ message: 'Invalid JSON' }); }
 	}
 	if (!body || typeof body !== 'object') {
