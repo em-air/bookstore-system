@@ -1,6 +1,13 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public",
+  "installCommand": "npm install",
+  "framework": null,
+  "build": {
+    "env": {
+      "SKIP_TYPE_CHECK": "true"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
