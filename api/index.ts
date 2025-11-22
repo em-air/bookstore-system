@@ -1,3 +1,4 @@
+// Vercel serverless handler with ESM support
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fs from 'fs';
 import path from 'path';
