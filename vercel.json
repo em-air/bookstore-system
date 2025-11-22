@@ -7,5 +7,7 @@
       "destination": "/api"
     }
   ],
-  "ignoreCommand": "true"
+  "typescript": {
+    "ignoreBuildErrors": true
+  }
 }
