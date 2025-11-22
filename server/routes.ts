@@ -1,9 +1,9 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertBookSchema, insertReviewSchema, insertRefundSchema, insertCardSchema } from "../shared/schema";
+import { insertUserSchema, insertBookSchema, insertReviewSchema, insertRefundSchema, insertCardSchema } from "../shared/schema.js";
 import { z } from "zod";
 
 const JWT_SECRET = process.env.SESSION_SECRET || "your-secret-key-change-in-production";

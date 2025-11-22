@@ -5,8 +5,8 @@ import {
   type OrderItem, type InsertOrderItem, type Review, type InsertReview,
   type Refund, type InsertRefund, type Card, type InsertCard,
   type CartItemWithBook, type OrderWithItems
-} from "../shared/schema";
-import { db } from "./db";
+} from "../shared/schema.js";
+import { db } from "./db.js";
 import { eq, and, desc, sql } from "drizzle-orm";
 
 export interface IStorage {

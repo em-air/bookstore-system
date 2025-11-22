@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { db } from "./db";
-import { users, books, reviews, refunds, orders, orderItems, cartItems, shoppingCartItems, shoppingCarts, storeInventory, cards } from "../shared/schema";
+import { db } from "./db.js";
+import { users, books, reviews, refunds, orders, orderItems, cartItems, shoppingCartItems, shoppingCarts, storeInventory, cards } from "../shared/schema.js";
 import { sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
