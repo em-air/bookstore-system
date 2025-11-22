@@ -6,5 +6,6 @@
       "source": "/api/(.*)",
       "destination": "/api"
     }
-  ]
+  ],
+  "ignoreCommand": "true"
 }
