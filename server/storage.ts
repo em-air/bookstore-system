@@ -5,7 +5,7 @@ import {
   type OrderItem, type InsertOrderItem, type Review, type InsertReview,
   type Refund, type InsertRefund, type Card, type InsertCard,
   type CartItemWithBook, type OrderWithItems
-} from "@shared/schema";
+} from "../shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
 

@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertBookSchema, insertReviewSchema, insertRefundSchema, insertCardSchema } from "@shared/schema";
+import { insertUserSchema, insertBookSchema, insertReviewSchema, insertRefundSchema, insertCardSchema } from "../shared/schema";
 import { z } from "zod";
 
 const JWT_SECRET = process.env.SESSION_SECRET || "your-secret-key-change-in-production";
