@@ -27,7 +27,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		try { body = JSON.parse(body); } catch { return res.status(400).json({ message: 'Invalid JSON' }); }
 	}
 	if (!body || typeof body !== 'object') {
-		return res.status(400).json({ message: 'Invalid JSON' });
+		const q: any = (req as any).query || {};
+		if (q.email && q.password) {
+			body = { email: q.email, password: q.password };
+		} else {
+			return res.status(400).json({ message: 'Invalid JSON' });
+		}
 	}
 
 	try {
