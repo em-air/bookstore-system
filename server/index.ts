@@ -1,7 +1,8 @@
 import "dotenv/config";
-import express, { type Request, type Response, type NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes.js";
-import { log } from "./log.js";
+import { log } from "./log";
 
 const app = express();
 
@@ -10,11 +11,8 @@ declare module 'http' {
     rawBody: unknown
   }
 }
-app.use(express.json({
-  verify: (req, _res, buf) => {
-    req.rawBody = buf;
-  }
-}));
+// Standard JSON parser (rawBody verify removed for Vercel compatibility)
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
