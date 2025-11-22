@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes.js";
-import { setupVite, serveStatic, log } from "./vite.js";
+import { log } from "./log.js";
 
 const app = express();
 
@@ -60,17 +60,16 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   }
 });
 
-// Only run server in development
+// Only run dev server locally; production (Vercel) just exports app for serverless
 if (process.env.NODE_ENV !== "production") {
   const { createServer } = await import("http");
   const server = createServer(app);
-  
-  if (app.get("env") === "development") {
+  try {
+    const { setupVite } = await import("./vite.js");
     await setupVite(app, server);
-  } else {
-    serveStatic(app);
+  } catch (e) {
+    log(`Vite dev middleware failed: ${(e as Error).message}`, 'dev');
   }
-
   const port = parseInt(process.env.PORT || '5000', 10);
   server.listen(port, "127.0.0.1", () => {
     log(`serving on port ${port}`);
