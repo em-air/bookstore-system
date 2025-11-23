@@ -15,33 +15,8 @@ function log(message: string, source = 'express') {
 
 const app = express();
 
-declare module 'http' {
-  interface IncomingMessage {
-    rawBody: unknown
-  }
-}
-// Custom lightweight JSON parser (addresses Vercel body parsing issues for POST/PATCH)
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const contentType = req.headers['content-type'] || '';
-  if ((req.method === 'POST' || req.method === 'PATCH' || req.method === 'PUT') && contentType.includes('application/json')) {
-    let data = '';
-    req.on('data', chunk => { data += chunk; });
-    req.on('end', () => {
-      if (data.length === 0) {
-        req.body = {};
-        return next();
-      }
-      try {
-        req.body = JSON.parse(data);
-        next();
-      } catch (e) {
-        return res.status(400).json({ message: 'Invalid JSON' });
-      }
-    });
-  } else {
-    next();
-  }
-});
+// Use standard Express parsers - Vercel handles body buffering
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
