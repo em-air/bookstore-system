@@ -131,7 +131,7 @@ export function registerRoutes(app: Express): void {
       if (book.stock < quantity) return res.status(400).json({ message: "Insufficient stock" });
 
       const item = await storage.addToCart({ userId: req.userId!, bookId, quantity });
-      res.json(item);
+      res.json({ ...item, message: "Item added to cart successfully" });
     } catch {
       res.status(500).json({ message: "Failed to add to cart" });
     }
@@ -144,7 +144,7 @@ export function registerRoutes(app: Express): void {
 
       const item = await storage.updateCartItem(parseInt(req.params.id), quantity);
       if (!item) return res.status(404).json({ message: "Cart item not found" });
-      res.json(item);
+      res.json({ ...item, message: "Cart item updated successfully" });
     } catch {
       res.status(500).json({ message: "Failed to update cart item" });
     }
@@ -153,7 +153,7 @@ export function registerRoutes(app: Express): void {
   app.delete("/api/cart/:id", authenticate, async (req: AuthRequest, res) => {
     try {
       await storage.removeFromCart(parseInt(req.params.id));
-      res.json({ message: "Item removed" });
+      res.json({ message: "Item removed from cart successfully" });
     } catch {
       res.status(500).json({ message: "Failed to remove item" });
     }
@@ -172,7 +172,7 @@ export function registerRoutes(app: Express): void {
     try {
       const data = insertCardSchema.parse({ ...req.body, userId: req.userId });
       const card = await storage.createCard(data);
-      res.json(card);
+      res.json({ ...card, message: "Payment card added successfully" });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
@@ -184,7 +184,7 @@ export function registerRoutes(app: Express): void {
   app.delete("/api/cards/:id", authenticate, async (req: AuthRequest, res) => {
     try {
       await storage.deleteCard(parseInt(req.params.id));
-      res.json({ message: "Card deleted" });
+      res.json({ message: "Payment card deleted successfully" });
     } catch {
       res.status(500).json({ message: "Failed to delete card" });
     }
@@ -212,9 +212,27 @@ export function registerRoutes(app: Express): void {
       }
 
       const order = await storage.createOrder(req.userId!, cartItems, cardId);
-      res.json(order);
+      res.json({ ...order, message: "Order placed successfully" });
     } catch {
       res.status(500).json({ message: "Failed to create order" });
+    }
+  });
+
+  app.delete("/api/orders/:id", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const orderId = parseInt(req.params.id);
+      const order = await storage.getOrder(orderId);
+      
+      if (!order) return res.status(404).json({ message: "Order not found" });
+      if (order.userId !== req.userId) return res.status(403).json({ message: "Not your order" });
+      if (order.status === "completed") {
+        return res.status(400).json({ message: "Cannot cancel completed orders. Please request a refund instead." });
+      }
+
+      const cancelled = await storage.updateOrderStatus(orderId, "cancelled");
+      res.json({ ...cancelled, message: "Order cancelled successfully" });
+    } catch {
+      res.status(500).json({ message: "Failed to cancel order" });
     }
   });
 
@@ -227,7 +245,7 @@ export function registerRoutes(app: Express): void {
       }
 
       const review = await storage.createReview(data);
-      res.json(review);
+      res.json({ ...review, message: "Review submitted successfully" });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors[0].message });

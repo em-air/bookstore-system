@@ -33,13 +33,19 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+      const statusEmoji = res.statusCode >= 200 && res.statusCode < 300 ? '✅' : 
+                          res.statusCode >= 400 && res.statusCode < 500 ? '⚠️' : '❌';
+      
+      let action = '';
+      if (req.method === 'POST') action = '➕ Created';
+      else if (req.method === 'PATCH' || req.method === 'PUT') action = '📝 Updated';
+      else if (req.method === 'DELETE') action = '🗑️ Deleted';
+      else if (req.method === 'GET') action = '📖 Read';
+      
+      let logLine = `${statusEmoji} ${action} | ${req.method} ${path} | Status: ${res.statusCode} | ${duration}ms`;
+      
+      if (capturedJsonResponse && capturedJsonResponse.message) {
+        logLine += ` | ${capturedJsonResponse.message}`;
       }
 
       log(logLine);
