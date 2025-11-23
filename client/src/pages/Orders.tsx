@@ -34,6 +34,26 @@ export default function Orders() {
     queryKey: ["/api/refunds"],
   });
 
+  const cancelOrderMutation = useMutation({
+    mutationFn: async (orderId: number) => {
+      return apiRequest("DELETE", `/api/orders/${orderId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      toast({
+        title: "Order cancelled",
+        description: "Your order has been cancelled successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const requestRefundMutation = useMutation({
     mutationFn: async (orderId: number) => {
       return apiRequest("POST", "/api/refunds", {
@@ -173,67 +193,81 @@ export default function Orders() {
                   ))}
                 </div>
 
-                {refund ? (
-                  <div className="border-t pt-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <AlertCircle className="h-4 w-4" />
-                      <span className="font-medium">Refund Status:</span>
-                      <Badge 
-                        variant={refund.status === "approved" ? "default" : refund.status === "denied" ? "destructive" : "secondary"}
-                        data-testid={`badge-refund-status-${order.id}`}
-                      >
-                        {refund.status}
-                      </Badge>
-                    </div>
-                    {refund.reason && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        Reason: {refund.reason}
-                      </p>
-                    )}
-                  </div>
-                ) : order.status === "completed" && (
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setSelectedOrderId(order.id)}
-                        data-testid={`button-request-refund-${order.id}`}
-                      >
-                        Request Refund
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Request Refund</DialogTitle>
-                        <DialogDescription>
-                          Please provide a reason for the refund request
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="reason">Reason</Label>
-                          <Textarea
-                            id="reason"
-                            value={refundReason}
-                            onChange={(e) => setRefundReason(e.target.value)}
-                            placeholder="Please explain why you'd like a refund..."
-                            className="min-h-[100px]"
-                            data-testid="input-refund-reason"
-                          />
-                        </div>
-                        <Button
-                          onClick={() => requestRefundMutation.mutate(order.id)}
-                          disabled={refundReason.length < 10 || requestRefundMutation.isPending}
-                          className="w-full"
-                          data-testid="button-submit-refund"
+                <div className="flex gap-2 flex-wrap">
+                  {order.status === "pending" && (
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={() => cancelOrderMutation.mutate(order.id)}
+                      disabled={cancelOrderMutation.isPending}
+                      data-testid={`button-cancel-order-${order.id}`}
+                    >
+                      {cancelOrderMutation.isPending ? "Cancelling..." : "Cancel Order"}
+                    </Button>
+                  )}
+
+                  {refund ? (
+                    <div className="border-t pt-4 w-full">
+                      <div className="flex items-center gap-2 text-sm">
+                        <AlertCircle className="h-4 w-4" />
+                        <span className="font-medium">Refund Status:</span>
+                        <Badge 
+                          variant={refund.status === "approved" ? "default" : refund.status === "denied" ? "destructive" : "secondary"}
+                          data-testid={`badge-refund-status-${order.id}`}
                         >
-                          {requestRefundMutation.isPending ? "Submitting..." : "Submit Request"}
-                        </Button>
+                          {refund.status}
+                        </Badge>
                       </div>
-                    </DialogContent>
-                  </Dialog>
-                )}
+                      {refund.reason && (
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Reason: {refund.reason}
+                        </p>
+                      )}
+                    </div>
+                  ) : order.status === "completed" && (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setSelectedOrderId(order.id)}
+                          data-testid={`button-request-refund-${order.id}`}
+                        >
+                          Request Refund
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Request Refund</DialogTitle>
+                          <DialogDescription>
+                            Please provide a reason for the refund request
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="reason">Reason</Label>
+                            <Textarea
+                              id="reason"
+                              value={refundReason}
+                              onChange={(e) => setRefundReason(e.target.value)}
+                              placeholder="Please explain why you'd like a refund..."
+                              className="min-h-[100px]"
+                              data-testid="input-refund-reason"
+                            />
+                          </div>
+                          <Button
+                            onClick={() => requestRefundMutation.mutate(order.id)}
+                            disabled={refundReason.length < 10 || requestRefundMutation.isPending}
+                            className="w-full"
+                            data-testid="button-submit-refund"
+                          >
+                            {requestRefundMutation.isPending ? "Submitting..." : "Submit Request"}
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </div>
               </Card>
             );
           })}

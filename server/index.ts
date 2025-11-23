@@ -33,7 +33,8 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      const statusEmoji = res.statusCode >= 200 && res.statusCode < 300 ? '✅' : 
+      const isSuccess = res.statusCode >= 200 && res.statusCode < 300;
+      const statusEmoji = isSuccess ? '✅' : 
                           res.statusCode >= 400 && res.statusCode < 500 ? '⚠️' : '❌';
       
       let action = '';
@@ -48,7 +49,15 @@ app.use((req, res, next) => {
         logLine += ` | ${capturedJsonResponse.message}`;
       }
 
-      log(logLine);
+      // Always log successful API calls prominently
+      if (isSuccess) {
+        console.log('\n' + '='.repeat(80));
+        console.log(`🎉 API SUCCESS: ${action} operation completed`);
+        console.log(logLine);
+        console.log('='.repeat(80) + '\n');
+      } else {
+        log(logLine);
+      }
     }
   });
 
