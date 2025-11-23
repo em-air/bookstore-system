@@ -3,7 +3,7 @@
   "outputDirectory": "dist/public",
   "rewrites": [],
   "functions": {
-    "api/**/*.ts": {
+    "api/[...path].ts": {
       "includeFiles": "{shared,server}/**"
     }
   }

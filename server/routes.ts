@@ -278,6 +278,27 @@ export function registerRoutes(app: Express): void {
     }
   });
 
+  // Staff list books (same data as public, but guarded for symmetry if needed)
+  app.get("/api/staff/books", authenticate, requireStaff, async (_req: AuthRequest, res) => {
+    try {
+      const books = await storage.getAllBooks();
+      res.json(books);
+    } catch {
+      res.status(500).json({ message: "Failed to fetch books" });
+    }
+  });
+
+  // Staff get single book
+  app.get("/api/staff/books/:id", authenticate, requireStaff, async (req: AuthRequest, res) => {
+    try {
+      const book = await storage.getBook(parseInt(req.params.id));
+      if (!book) return res.status(404).json({ message: "Book not found" });
+      res.json(book);
+    } catch {
+      res.status(500).json({ message: "Failed to fetch book" });
+    }
+  });
+
   app.patch("/api/staff/books/:id", authenticate, requireStaff, async (req: AuthRequest, res) => {
     try {
       const book = await storage.updateBook(parseInt(req.params.id), req.body);
